@@ -99,8 +99,12 @@ kube_proxy_mode: iptables
 
 # Kube-proxy nodeport address.
 # cidr to bind nodeport services. Flag --nodeport-addresses on kube-proxy manifest
-kube_proxy_nodeport_addresses: false
-# kube_proxy_nodeport_addresses_cidr: 10.0.1.0/24
+kube_proxy_nodeport_addresses: >-
+  {%- if kube_proxy_nodeport_addresses_cidr is defined -%}
+  [{{ kube_proxy_nodeport_addresses_cidr }}]
+  {%- else -%}
+  []
+  {%- endif -%}
 
 ## Encrypting Secret Data at Rest (experimental)
 kube_encrypt_secret_data: false
