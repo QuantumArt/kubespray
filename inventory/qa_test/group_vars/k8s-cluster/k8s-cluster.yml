@@ -99,7 +99,12 @@ kube_proxy_mode: iptables
 
 # Kube-proxy nodeport address.
 # cidr to bind nodeport services. Flag --nodeport-addresses on kube-proxy manifest
-kube_proxy_nodeport_addresses: false
+kube_proxy_nodeport_addresses:  >-
+  {%- if kube_proxy_nodeport_addresses_cidr is defined -%}
+  [{{ kube_proxy_nodeport_addresses_cidr }}]
+  {%- else -%}
+  []
+  {%- endif -%}
 # kube_proxy_nodeport_addresses_cidr: 10.0.1.0/24
 
 ## Encrypting Secret Data at Rest (experimental)
@@ -107,7 +112,7 @@ kube_encrypt_secret_data: false
 
 # DNS configuration.
 # Kubernetes cluster name, also will be used as DNS domain
-cluster_name: qakubecluster.artq.com
+cluster_name: qatestcluster.artq.com
 # Subdomains of DNS domain to be resolved via /etc/resolv.conf for hostnet pods
 ndots: 2
 # Can be dnsmasq_kubedns, kubedns, coredns, coredns_dual, manual or none

@@ -150,12 +150,33 @@
         inventory_hostname in groups['k8s-cluster']) and
         sync_certs|default(false) and inventory_hostname not in groups['etcd']
   notify: set etcd_secret_changed
+   
+- name: Gen_certs | create symbol link to key
+  file:
+    src: "{{ etcd_cert_dir }}/node-{{ inventory_hostname }}-key.pem"
+    dest: "{{ etcd_cert_dir }}/node-key.pem"
+    state: link
+  when: (('calico-rr' in groups and inventory_hostname in groups['calico-rr']) or
+        inventory_hostname in groups['k8s-cluster']) and
+        sync_certs|default(false) and inventory_hostname not in groups['etcd'] and
+        etcd_key_link_name is not undefined and etcd_key_link_name != "" 
+        
+    
+- name: Gen_certs | create symbol link to certificate
+  file:
+    src: "{{ etcd_cert_dir }}/node-{{ inventory_hostname }}.pem"
+    dest: "{{ etcd_cert_dir }}/node-certificate.pem"
+    state: link
+  when: (('calico-rr' in groups and inventory_hostname in groups['calico-rr']) or
+        inventory_hostname in groups['k8s-cluster']) and
+        sync_certs|default(false) and inventory_hostname not in groups['etcd'] and 
+        etcd_cert_link_name is not undefined and etcd_cert_link_name != "" 
 
 - name: Gen_certs | check certificate permissions
   file:
-    path: "{{ etcd_cert_dir }}"
+    path: "{{ etcd_config_dir}}"
     group: "{{ etcd_cert_group }}"
     state: directory
     owner: kube
-    mode: 0640
+    mode: 0755
     recurse: yes
